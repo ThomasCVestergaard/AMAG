@@ -11,13 +11,20 @@ import numpy as np
 
 """Ray Vectors"""
 
-theta = random.uniform(0,(2*math.pi))
+def RayVectors(theta,phi):
+        vector=np.array([(math.sin(theta)*math.cos(phi),math.sin(theta)*math.sin(phi),math.cos(theta))])
+        return vector
     
-phi = random.uniform(0,(2*math.pi))
+RanVec=[]
 
-def RayVectors(i*theta,i*phi):
-    vector=np.array([(math.sin(theta)*math.cos(phi),math.sin(theta)*math.sin(phi),math.cos(theta))])
-    return vector
+for i in range (10):
+    
+    theta = random.uniform(0,(2*math.pi))
+    
+    phi = random.uniform(0,(2*math.pi))
+    RanVec.append(RayVectors(theta,phi))
+
+    
 
 
-print(RayVectors(theta,phi))
+print(RanVec)
