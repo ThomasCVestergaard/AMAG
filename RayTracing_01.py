@@ -18,6 +18,7 @@ def RayVectors(RayPoints,OrigoPoints):
     return Vector
     
 RayVec=[]
+print range(int(n))
 for i in range (n):
     
     theta = random.uniform(0,(2*math.pi))  
@@ -27,6 +28,6 @@ for i in range (n):
     y = 0
     z = 0
     
-RayVec.append(RayVectors(RayPoints(theta,phi),OrigoPoints(x,y,z)))
+    RayVec.append(RayVectors(RayPoints(theta,phi),OrigoPoints(x,y,z)))
 
 print RayVec
