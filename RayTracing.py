@@ -1,30 +1,44 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 12 09:38:57 2017
-
-@author: Thomas
-"""
-
-import random
+﻿import random
 import math
-import numpy as np
-
-"""Ray Vectors"""
-
-def RayVectors(theta,phi):
-        vector=np.array([(math.sin(theta)*math.cos(phi),math.sin(theta)*math.sin(phi),math.cos(theta))])
-        return vector
+import rhinoscriptsyntax as rs
     
-RanVec=[]
+"""Source Point"""
+SourcePoint=rs.AddPoint(SP)
 
-for i in range (10):
+SPnt=[]
+SPnt.append(SourcePoint)
+print SPnt
+
+def SourcePoint(SP):
+    point=rs.AddPoint(SP)
+    return point
     
-    theta = random.uniform(0,(2*math.pi))
+"""Ray Vector Points"""
+def RayPoints(theta,phi):
+    point=rs.AddPoint(math.sin(theta)*math.cos(phi), math.sin(theta)*math.sin(phi), math.cos(theta))
+    return point
     
+"""Ray Vector Origo Points"""
+def OrigoPoints(x,y,z):
+    point=rs.AddPoint(x,y,z)
+    return point
+    
+"""Ray Vectors between Ray Vector Points and Origo"""
+def RayVectors(RayPoints,OrigoPoints):
+    Vector=rs.VectorCreate(RayPoints,OrigoPoints)
+    return Vector
+    
+RayVec=[]
+print range(int(n))
+for i in range (n):
+    
+    theta = random.uniform(0,(2*math.pi))  
     phi = random.uniform(0,(2*math.pi))
-    RanVec.append(RayVectors(theta,phi))
-
     
+    x = 0
+    y = 0
+    z = 0
+    
+    RayVec.append(RayVectors(RayPoints(theta,phi),OrigoPoints(x,y,z)))
 
-
-print(RanVec)
+print RayVec
