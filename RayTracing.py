@@ -7,11 +7,6 @@ SourcePoint=rs.AddPoint(SP)
 
 SPnt=[]
 SPnt.append(SourcePoint)
-print SPnt
-
-def SourcePoint(SP):
-    point=rs.AddPoint(SP)
-    return point
     
 """Ray Vector Points"""
 def RayPoints(theta,phi):
@@ -42,3 +37,5 @@ for i in range (n):
     RayVec.append(RayVectors(RayPoints(theta,phi),OrigoPoints(x,y,z)))
 
 print RayVec
+
+CS = G.IsPointInside(SP,0.01,True)
