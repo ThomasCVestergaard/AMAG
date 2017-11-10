@@ -12,7 +12,6 @@ CS = Geo.IsPointInside(SP,0.01,True)
 #Number of Surfaces in Geometry
 F=Geo.Surfaces.Count
 
-
 #Extracting Surfaces from Geometry
 Surfaces=[]
 def Surf(f):
@@ -21,8 +20,6 @@ def Surf(f):
 print range (int(F))
 for f in range (F):
     Surfaces.append(Surf(f))
-print Surfaces
-
 
 #Extracting Surface Points from Geometry Surfaces
 SurfPoints=[]
@@ -32,7 +29,6 @@ def SurfacePoints(f):
 print range (int(F))
 for f in range (F):
     SurfPoints.append(SurfacePoints(f))
-print SurfPoints
 
 #Surface Normal Vectors
 Param=[]
@@ -50,28 +46,16 @@ def SurfaceNormal(f):
 print range (int(F))
 for f in range (F):
     SurfNormal.append(SurfaceNormal(f))
-print SurfNormal
-
-#Vector From Source to Geometry planes
-LenVec=[]
-def LengthVectors(f):
-    vector=rs.VectorCreate(SurfPoints[f],SP)
-    return vector
-print range (int(F))
-for f in range (F):
-    LenVec.append(LengthVectors(f))
-print LenVec
+    
 
 #Ray Vector Points
 def RayPoints(theta,phi):
     point=rs.AddPoint(math.sin(theta)*math.cos(phi), math.sin(theta)*math.sin(phi), math.cos(theta))
     return point
-
 #Ray Vectors between Ray Vector Points and Origo
 def RayVectors(RayPoints,OrigoPoints):
     Vector=rs.VectorCreate(RayPoints,Origo)
     return Vector
-    
     
 #RayVectors
 RayVec=[]
@@ -80,39 +64,50 @@ for i in range (n):
     theta = random.uniform(0,(2*math.pi))  
     phi = random.uniform(0,(2*math.pi))
     RayVec.append(RayVectors(RayPoints(theta,phi),Origo))
-print RayVec
 
 
-#Distance from Source Point to Geometry Surfaces
-Dist=[]
-def Distance(f,i):
-    length=rs.VectorDotProduct(SurfNormal[f],LenVec[f])/rs.VectorDotProduct(RayVec[i],SurfNormal[f])
-    return length
-print range (int(i))
-for i in range (n):
+ReflectionPoints=[SP]
+Rays=[]
+RayData=[]
+RayData.append(SP)
+RayData.append(RayVec[0])
+
+r = R
+while r > 0:
+
+    #Vector From Source to Geometry planes
+    LenVec=[]
+    def LengthVectors(f):
+        vector=rs.VectorCreate(SurfPoints[f],RayData[0])
+        return vector
     print range (int(F))
     for f in range (F):
+        LenVec.append(LengthVectors(f))
+
+    #Distance from Source Point to Geometry Surfaces
+    Dist=[]
+    def Distance(f):
+        length=rs.VectorDotProduct(SurfNormal[f],LenVec[f])/rs.VectorDotProduct(RayData[1],SurfNormal[f])
+        return length
+    print range (int(F))
+    for f in range (F):
+        Dist.append(Distance(f))
     
-        Dist.append(Distance(f,i))
+    #Minimum distance
+    DistMin=min([n for n in Dist  if n>0])
+    index=[i for i,x in enumerate(Dist) if x == DistMin]
+
+    #Reflection Point
+    ReflectionPoint=RayData[0]+RayData[1]*DistMin
     
-#Minimum distance
-DistMin=min([n for n in Dist  if n>0])
+    ReflectionPoints.append(ReflectionPoint)
+    ReflectPoints=ReflectionPoints[:-1]
+    
+    Rays.append(rs.VectorCreate(ReflectionPoint,RayData[0]))
 
-index=[i for i,x in enumerate(Dist) if x == DistMin]
-
-#Reflection Point
-
-ReflectionPoint=[]
-def RefPoint(i):
-    Point=SP+RayVec[i]*DistMin
-    return Point
-
-
-for i in range (1):
-    ReflectionPoint.append(RefPoint(i))
-print ReflectionPoint
-
-InitVec=rs.VectorCreate(ReflectionPoint[0],SP)
-
-#Reflected Vector
-ReflectionVec=RayVec[0]-2*(rs.VectorDotProduct(SurfNormal[index[0]],RayVec[0]))*SurfNormal[index[0]]
+    #Reflected Vector
+    ReflectionVec=RayData[1]-2*(rs.VectorDotProduct(SurfNormal[index[0]],RayData[1]))*SurfNormal[index[0]]
+    
+    RayData=(ReflectionPoint,ReflectionVec)
+    
+    r = r-1
