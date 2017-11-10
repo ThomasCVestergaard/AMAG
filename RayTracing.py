@@ -38,14 +38,14 @@ print SurfPoints
 Param=[]
 def UV_Param(f):
     point=rs.SurfaceClosestPoint(Surfaces[f],SurfPoints[f])
-    return point
+    return point[0]
 print range (int(F))
 for f in range (F):
     Param.append(UV_Param(f))
     
 SurfNormal=[]
 def SurfaceNormal(f):
-    vector=rs.VectorReverse(rs.SurfaceNormal(Surfaces[f],param))
+    vector=rs.VectorReverse(rs.SurfaceNormal(Surfaces[f],Param))
     return vector
 print range (int(F))
 for f in range (F):
@@ -79,7 +79,7 @@ print range(int(n))
 for i in range (n):
     theta = random.uniform(0,(2*math.pi))  
     phi = random.uniform(0,(2*math.pi))
-    RayVec.append(RayVectors(RayPoints(theta,phi),OrigoPoints(x,y,z)))
+    RayVec.append(RayVectors(RayPoints(theta,phi),Origo))
 print RayVec
 
 
