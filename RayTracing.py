@@ -58,72 +58,79 @@ def RayVectors(RayPoints,OrigoPoints):
     Vector = rs.VectorCreate(RayPoints,Origo)
     return Vector
     
-#RayVectors
-RayVec = []
-print range(int(n))
-for i in range (n):
-    theta = random.uniform(0,(2*math.pi))  
-    phi = random.uniform(0,(2*math.pi))
-    RayVec.append(RayVectors(RayPoints(theta,phi),Origo))
-
+    
 Alpha = []
 for i in range (F):
     Alpha.append(alpha)
     
-ReflectionPoints = [SP]
-RefVec = [RayVec[0]]
-Distances = []
-MinDistances = []
-Rays = []
-RayData = []
-RayData.append(SP)
-RayData.append(RayVec[0])
-TravelLength = 0
-E = 1
-while E > 1*10**-12:
-    #Vector From Source to Geometry Surfaces
-    LenVec = []
-    def LengthVectors(f):
-        vector = rs.VectorCreate(SurfPoints[f],RayData[0])
-        return vector
-    for f in range (F):
-        LenVec.append(LengthVectors(f))
+DT = []
+for i in range (n):
     
-    Dist = []
-    #Distance from Source Point to Geometry Surfaces
-    def Distance(f):
-        length = (rs.VectorDotProduct(SurfNormal[f],LenVec[f]))/(rs.VectorDotProduct(RayData[1],SurfNormal[f]))
-        return length
-    for f in range (F):
-        Dist.append(Distance(f))
+    #RayVectors
+    RayVec = []
+    print range(int(n))
+    for i in range (n):
+        theta = random.uniform(0,(2*math.pi))  
+        phi = random.uniform(0,(2*math.pi))
+        RayVec.append(RayVectors(RayPoints(theta,phi),Origo))
+        
+    ReflectionPoints = [SP]
+    RefVec = [RayVec[0]]
+    Distances = []
+    MinDistances = []
+    Rays = []
+    RayData = []
+    RayData.append(SP)
+    RayData.append(RayVec[0])
+    TravelLength = 0
+    E = 1
+    while E > 1*10**-12:
+        #Vector From Source to Geometry Surfaces
+        LenVec = []
+        def LengthVectors(f):
+            vector = rs.VectorCreate(SurfPoints[f],RayData[0])
+            return vector
+        for f in range (F):
+            LenVec.append(LengthVectors(f))
     
-        Distances.append(Distance(f))
+        Dist = []
+        #Distance from Source Point to Geometry Surfaces
+        def Distance(f):
+            length = (rs.VectorDotProduct(SurfNormal[f],LenVec[f]))/(rs.VectorDotProduct(RayData[1],SurfNormal[f]))
+            return length
+        for f in range (F):
+            Dist.append(Distance(f))
+            
+            Distances.append(Distance(f))
     
-    #Minimum distance
-    DistMin = min(n for n in Dist if n > 1*10**-12)
-    index = [i for i,x in enumerate(Dist) if x == DistMin]
+        #Minimum distance
+        DistMin = min(n for n in Dist if n > 1*10**-9)
+        index = [i for i,x in enumerate(Dist) if x == DistMin]
     
-    #Reflection Point
-    ReflectionPoint = RayData[0]+RayData[1]*DistMin
+        #Reflection Point
+        ReflectionPoint = RayData[0]+RayData[1]*DistMin
     
-    ReflectionPoints.append(ReflectionPoint)
-    ReflectPoints=ReflectionPoints[:-1]
+        ReflectionPoints.append(ReflectionPoint)
+        ReflectPoints=ReflectionPoints[:-1]
     
-    Rays.append(rs.VectorCreate(ReflectionPoint,RayData[0]))
+        Rays.append(rs.VectorCreate(ReflectionPoint,RayData[0]))
     
-    #Reflected Vector
-    ReflectionVec = rs.VectorSubtract(RayData[1],(2*SurfNormal[index[0]]*rs.VectorDotProduct(SurfNormal[index[0]],RayData[1])))
-    NormVec=rs.VectorCrossProduct(RayData[1],ReflectionVec)
+        #Reflected Vector
+        ReflectionVec = rs.VectorSubtract(RayData[1],(2*SurfNormal[index[0]]*rs.VectorDotProduct(SurfNormal[index[0]],RayData[1])))
+        NormVec=rs.VectorCrossProduct(RayData[1],ReflectionVec)
     
-    print ReflectionVec
-    RefVec.append(ReflectionVec)
-    RefVector = RefVec[:-1]
+        print ReflectionVec
+        RefVec.append(ReflectionVec)
+        RefVector = RefVec[:-1]
     
-    RayData=(ReflectionPoint,ReflectionVec)
+        RayData=(ReflectionPoint,ReflectionVec)
     
-    E = math.exp(-0.0009*10**-3*DistMin)*(1-Alpha[index[0]])*E
+        E = math.exp(-0.0009*10**-3*DistMin)*(1-Alpha[index[0]])*E
     
-    TravelLength = TravelLength+DistMin
+        TravelLength = TravelLength+DistMin
     
-    DecayTime = (TravelLength/10**3)/343
+        DecayTime = (TravelLength/10**3)/343
+    
+        if E < 1*10**-12:
+            DT.append(DecayTime)
 
