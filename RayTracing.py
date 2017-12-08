@@ -1,4 +1,6 @@
-﻿import random
+﻿
+
+import random
 import math
 import rhinoscriptsyntax as rs
 import Rhino as rc
@@ -64,6 +66,10 @@ for i in range (n):
     phi = random.uniform(0,(2*math.pi))
     RayVec.append(RayVectors(RayPoints(theta,phi),Origo))
 
+Alpha = []
+for i in range (F):
+    Alpha.append(alpha)
+    
 ReflectionPoints = [SP]
 RefVec = [RayVec[0]]
 Distances = []
@@ -72,9 +78,9 @@ Rays = []
 RayData = []
 RayData.append(SP)
 RayData.append(RayVec[0])
-
-r = R
-while r > 0:
+TravelLength = 0
+E = 1
+while E > 1*10**-12:
     #Vector From Source to Geometry Surfaces
     LenVec = []
     def LengthVectors(f):
@@ -97,8 +103,6 @@ while r > 0:
     DistMin = min(n for n in Dist if n > 1*10**-12)
     index = [i for i,x in enumerate(Dist) if x == DistMin]
     
-    MinDistances.append(DistMin)
-    MinDistances.append(index[0])
     #Reflection Point
     ReflectionPoint = RayData[0]+RayData[1]*DistMin
     
@@ -110,8 +114,6 @@ while r > 0:
     #Reflected Vector
     ReflectionVec = rs.VectorSubtract(RayData[1],(2*SurfNormal[index[0]]*rs.VectorDotProduct(SurfNormal[index[0]],RayData[1])))
     NormVec=rs.VectorCrossProduct(RayData[1],ReflectionVec)
-    #if  rs.VectorAngle(SurfNormal[index[0]],ReflectionVec) > 90:
-        #ReflectionVec=rs.VectorRotate(ReflectionVec,180-2*rs.VectorAngle(SurfNormal[index[0]],ReflectionVec),NormVec)
     
     print ReflectionVec
     RefVec.append(ReflectionVec)
@@ -119,5 +121,9 @@ while r > 0:
     
     RayData=(ReflectionPoint,ReflectionVec)
     
-    r = r-1
+    E = math.exp(-0.0009*10**-3*DistMin)*(1-Alpha[index[0]])*E
+    
+    TravelLength = TravelLength+DistMin
+    
+    DecayTime = (TravelLength/10**3)/343
 
