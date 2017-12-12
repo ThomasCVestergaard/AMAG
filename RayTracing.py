@@ -3,7 +3,6 @@ import math
 import rhinoscriptsyntax as rs
 import Rhino as rc
 import clr
-clr.LoadTypeLibrary
 
 Geo=rc.Geometry.Brep.Duplicate(G)
 Origo=rs.AddPoint(0,0,0)
@@ -77,8 +76,6 @@ for i in range (F):
 if Run == True:
     if SPC == True:
         if RPC == True:
-            
-            
             
             Energy = []
             DT = []
@@ -173,8 +170,8 @@ if Run == True:
     else:
         M2 = ("Source Point is outside Geometry")
         Messages.append(M2)
-RT = [0]
-SPL = [0]
+RT = []
+SPL = []
 for i in range (n):
     SPL.append(10*math.log10(Energy[i]))
 for i in range (n):
@@ -188,7 +185,98 @@ RTSPL.sort()
 SPL_Sorted = [SPL1 for RT1, SPL1 in RTSPL]
 
 RT1 = [list(RT1) for RT1 in zip(*RTSPL)]
+
 SPL = SPL_Sorted
 RT = RT1[0]
-print RT
-print SPL
+
+RT_1000 = []
+
+TimeSteps = range(int(math.floor(min(RT))),int(math.ceil(max(RT)*1000))+3,3)
+
+Indexes = []
+
+def RT1000(t):
+    Item = RT[t]*1000
+    return Item
+    
+for t in range (len(RT)):
+    RT_1000.append(RT1000(t))
+    i = 0
+    while i < len(TimeSteps):
+        if  TimeSteps[i] <= RT_1000[t] <= TimeSteps[1+i]:
+            Indx = ([q for q,x in enumerate(RT_1000) if x == RT_1000[t]])
+            Indexes.append([Indx[0],(TimeSteps[i]+TimeSteps[1+i])/2])
+            break
+        else:
+            i = i+1
+    
+CollectiveSplIndexes = []
+CollectiveDecaytimes = []
+
+q = 0
+while q < len(TimeSteps):
+    SplIndexes = []
+    Decaytimes = []
+    p = 0
+    while p < len(Indexes):
+        if TimeSteps[q] <= Indexes[p][1] <= TimeSteps[1+q]:
+            SplIndexes.append(Indexes[p][0])
+            Decaytimes.append(Indexes[p][1])
+            break
+        else:
+            p = p+1
+            
+    CollectiveSplIndexes.append(SplIndexes)
+    CollectiveDecaytimes.append(Decaytimes)
+    q = q+1
+
+SPLSums = []
+for i in range (len(CollectiveSplIndexes)):
+    if CollectiveSplIndexes[i] == []:
+        continue
+    else:
+        a = 0
+        w = 0
+        while w < (len(CollectiveSplIndexes[i])):
+            a = a + (SPL[CollectiveSplIndexes[i][w]])
+            w = w + 1
+    SPLSums.append(a)
+
+DecayTimes = []
+for i in range (len(CollectiveDecaytimes)):
+    if CollectiveDecaytimes[i] == []:
+        continue
+    else:
+        b = CollectiveDecaytimes[i][0]*10**(-3)
+        
+        DecayTimes.append(b)
+
+DecayValues = [0] + SPLSums
+DecayTimes = [0] + DecayTimes
+
+#SPL values just below and above -5 dB
+SPLlowmin = min(n for n in DecayValues if n > -5)
+lowminindex = [i for i,x in enumerate(DecayValues) if x == SPLlowmin]
+
+SPLlowmax = max(n for n in DecayValues if n < -5)
+lowmaxindex = [i for i,x in enumerate(DecayValues) if x == SPLlowmax]
+
+#Interpolation for the -5 dB point
+FivedBDecay = (((-5-SPLlowmin)*(DecayTimes[lowmaxindex[0]]-DecayTimes[lowminindex[0]]))/(SPLlowmax-SPLlowmin))+DecayTimes[lowminindex[0]]
+#print FivedBDecay
+#print SPLlowmin+(FivedBDecay-DecayTimes[lowminindex[0]])*((SPLlowmax-SPLlowmin)/(DecayTimes[lowmaxindex[0]]-DecayTimes[lowminindex[0]]))
+
+#SPL values just below and above -35 dB
+SPLhighmin = min(n for n in DecayValues if n > -35)
+highminindex = [i for i,x in enumerate(DecayValues) if x == SPLhighmin]
+
+SPLhighmax = max(n for n in DecayValues if n < -35)
+highmaxindex = [i for i,x in enumerate(DecayValues) if x == SPLhighmax]
+
+#Interpolation for the -35 dB point
+ThirtyfivedBDecay = (((-35-SPLhighmin)*(DecayTimes[highmaxindex[0]]-DecayTimes[highminindex[0]]))/(SPLhighmax-SPLhighmin))+DecayTimes[highminindex[0]]
+#print ThirtyfivedBDecay
+#print SPLhighmin+(ThirtyfivedBDecay-DecayTimes[highminindex[0]])*((SPLhighmax-SPLhighmin)/(DecayTimes[highmaxindex[0]]-DecayTimes[highminindex[0]]))
+
+ReverberationTime = (ThirtyfivedBDecay - FivedBDecay)*2
+print ReverberationTime
